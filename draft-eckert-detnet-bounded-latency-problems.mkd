@@ -912,27 +912,30 @@ a maximum latency is specified. The draft outlines a control plane which similar
 tagging based CQF or {{TSN-ATS}} would put the work of admitting flows, determining their paths and admitting
 their resources along those paths to some form of PCE/SDN-Controller.
 
-The draft explicitly does not prescribes specific algorithms on the forwards to
+The draft explicitly does not prescribes specific algorithms on the forwarders to
 take the indicated latency for the hop into account in a way that the controller can
-calculate the resource availability. 
+calculate the resource availability, such as specific queuing or scheduling
+algorithms.
 
 It is not entirely clear to the authors of this memo, if the sole indication of
 such deadline latencies is sufficient to completely eliminate per-transit-hop, per-flow
 state. Consider that the packets latency for a hop could be used to derive a priority
 queue on the hop relative to other packets with higher or lower latency for this hop.
+
 As was shown in the research work leading up to {{TSN-ATS}}, the priority queuing on
 each hop alone is not sufficient to achieve a simple, solely per-hop calculated
-latency bound under high load causing multi-hop burst aggregation and the
+latency bound under high load because of the problem of multi-hop burst aggregation and the
 resulting hard to calculate incurred upper latency bound. To overcome that calculation
-issue,  shapers or as in {{TSN-ATS}} their optimization, interleaved regulators are required.
-Shapers/interleaved requires to maintain across packets from the same flow  per-flow state.
+issue,  shapers or as in {{TSN-ATS}} their optimization, interleaved regulators, are 
+used in {{TSN-ATS}} and GS.  Shapers/interleaved requires to maintain across packets
+from the same flow  per-flow state.
 
 Nevertheless, appropriate mathematical models for SDN controllers may be possible to develop
 deterministic per-hop forwarding models relying not only on the per-hop indicated latency but
 also on additional constraints such as limited number of hops or sufficiently low degrees of maximum
-admitted amount of traffic. Or else develop latency models that are not 100% deterministic,
-but close enough in probability such that the amount of late packets would be in the
-same order as otherwise acceptable problems such as BER based packet loss.
+admitted amount of traffic. Or else this may be used for to be developed latency models that
+are not 100% deterministic, but close enough in probability such that the amount of late
+packets would be in the same order as otherwise unavoidable problems such as BER based packet loss.
 
 Depending on the algorithms chosen, solutions may or may not rely on strong, weak, or no
 clock synchronization across nodes.
