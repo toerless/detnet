@@ -922,10 +922,6 @@ Internet-Draft                 detnet-tcqf                      May 2023
        +-- cycle_map[iif] # Incoming InterFace
            +--uint8 oif_cycle[iif_cycle]
 
-   # IP/IPv6 DSCP tagging specific data
-   tcqf_dscp[oif]
-   +--uint8 dscp[oif_cycle]
-
      Figure 6: Encapsulation independent TCQF Configuration Data Model
 
 4.2.  Packet processing
@@ -942,7 +938,11 @@ Internet-Draft                 detnet-tcqf                      May 2023
    independent of the specific encapsulation used for IP or MPLS to
    carry the cycle identification.
 
-
+   The model represents a single TQCF domain, which is a set of
+   interfaces acting both as ingress (iif) and egress (oif) interfaces,
+   capable to forward TCQF packets amongst each other.  A router may
+   have multiple TCQF domains each with a set of interfaces disjoint
+   from those of any other TCQF domain.
 
 
 
@@ -953,12 +953,6 @@ Eckert, et al.          Expires 22 November 2023               [Page 17]
 
 Internet-Draft                 detnet-tcqf                      May 2023
 
-
-   The model represents a single TQCF domain, which is a set of
-   interfaces acting both as ingress (iif) and egress (oif) interfaces,
-   capable to forward TCQF packets amongst each other.  A router may
-   have multiple TCQF domains each with a set of interfaces disjoint
-   from those of any other TCQF domain.
 
    tcqf.cycles is the number of cycles used across all interfaces in the
    TCQF domain. routers MUST support 3 and 4 cycles.  The maximum number
@@ -1002,6 +996,12 @@ Internet-Draft                 detnet-tcqf                      May 2023
    buffer) to use on oif is
    tcqf.if_config[oif].cycle_map[iif].oif_cycle[iif_cycle].  This is
    called the cycle mapping and is must be configurable.  This cycle
+   mapping always happens when the packet is received with a cycle tag
+   on an interface in a TCQF domain and forwarded to another interface
+   in the same TCQF domain.
+
+
+
 
 
 
@@ -1010,11 +1010,7 @@ Eckert, et al.          Expires 22 November 2023               [Page 18]
 Internet-Draft                 detnet-tcqf                      May 2023
 
 
-   mapping always happens when the packet is received with a cycle tag
-   on an interface in a TCQF domain and forwarded to another interface
-   in the same TCQF domain.
-
-   This encapsulation in dependent data model only defines how to map
+   This encapsulation independent data model only defines how to map
    from a received packets cycle to a sending interface cycle buffer and
    hence sent packet cycle.  It does not specify how the cycle
    identifier is encoded in the received or sent packet.  This is
@@ -1056,7 +1052,11 @@ Internet-Draft                 detnet-tcqf                      May 2023
    SHOULD be assigned from the internal cycle number after any label
    stack processing.
 
-
+   With this order of processing, TCQF can support forwarding of packets
+   with any label stack operations such as label swap in the case of LDP
+   or RSVP-TE created LSP, Penultimate Hop Popping (PHP), or no label
+   changes from SID hop-by-hop forwarding and/or SID/label pop as in the
+   case of SR-MPLS traffic steering.
 
 
 
@@ -1065,12 +1065,6 @@ Eckert, et al.          Expires 22 November 2023               [Page 19]
 
 Internet-Draft                 detnet-tcqf                      May 2023
 
-
-   With this order of processing, TCQF can support forwarding of packets
-   with any label stack operations such as label swap in the case of LDP
-   or RSVP-TE created LSP, Penultimate Hop Popping (PHP), or no label
-   changes from SID hop-by-hop forwarding and/or SID/label pop as in the
-   case of SR-MPLS traffic steering.
 
 4.4.  TCQF for IP/IPv6 with DSCP tagging
 
@@ -1115,14 +1109,18 @@ Internet-Draft                 detnet-tcqf                      May 2023
    tcqf_ipv6oh[oif]
    +--uint8 ipv6oh[oif_cycle]
 
+       Figure 9: TCQF Configuration Data for IPv6 TCQF Option Header
+
+
+
+
+
 
 
 Eckert, et al.          Expires 22 November 2023               [Page 20]
 
 Internet-Draft                 detnet-tcqf                      May 2023
 
-
-       Figure 9: TCQF Configuration Data for IPv6 TCQF Option Header
 
 4.5.1.  TCQF Option Format
 
@@ -1168,6 +1166,8 @@ Internet-Draft                 detnet-tcqf                      May 2023
       only when E-bit in Flags field is set to one.  [Editor's Note:
       Text will be modified or added as specific uses for this field are
       identified]
+
+
 
 
 

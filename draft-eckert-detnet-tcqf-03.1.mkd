@@ -714,10 +714,6 @@ IP DSCP tagging.
         +-- uint32 cycle_clock_offset
         +-- cycle_map[iif] # Incoming InterFace
             +--uint8 oif_cycle[iif_cycle]
-     
-    # IP/IPv6 DSCP tagging specific data
-    tcqf_dscp[oif]
-    +--uint8 dscp[oif_cycle]
 {: #FIG-Data-Model title="Encapsulation independent TCQF Configuration Data Model"}
 
 ## Packet processing  {#processing}
@@ -777,7 +773,7 @@ called the cycle mapping and is must be configurable. This cycle mapping
 always happens when the packet is received with a cycle tag on an interface
 in a TCQF domain and forwarded to another interface in the same TCQF domain.
 
-This encapsulation in dependent data model only defines how to map from
+This encapsulation independent data model only defines how to map from
 a received packets cycle to a sending interface cycle buffer and hence sent
 packet cycle. It does not specify how the cycle identifier is encoded in
 the received or sent packet. This is amended by the specification in the following
