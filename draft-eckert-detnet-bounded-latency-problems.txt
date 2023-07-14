@@ -5,8 +5,8 @@
 DETNET                                                         T. Eckert
 Internet-Draft                                Futurewei Technologies USA
 Intended status: Informational                                 S. Bryant
-Expires: January 13, 2022                             Stewart Bryant Ltd
-                                                           July 12, 2021
+Expires: 14 September 2023                            Stewart Bryant Ltd
+                                                           13 March 2023
 
 
     Problems with existing DetNet bounded latency queuing mechanisms
@@ -46,37 +46,37 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on January 13, 2022.
+   This Internet-Draft will expire on 14 September 2023.
 
 
 
 
 
 
-Eckert & Bryant         Expires January 13, 2022                [Page 1]
+Eckert & Bryant         Expires 14 September 2023               [Page 1]
 
-Internet-Draft          bounded-latency-problems               July 2021
+Internet-Draft          bounded-latency-problems              March 2023
 
 
 Copyright Notice
 
-   Copyright (c) 2021 IETF Trust and the persons identified as the
+   Copyright (c) 2023 IETF Trust and the persons identified as the
    document authors.  All rights reserved.
 
    This document is subject to BCP 78 and the IETF Trust's Legal
-   Provisions Relating to IETF Documents
-   (https://trustee.ietf.org/license-info) in effect on the date of
-   publication of this document.  Please review these documents
-   carefully, as they describe your rights and restrictions with respect
-   to this document.  Code Components extracted from this document must
-   include Simplified BSD License text as described in Section 4.e of
-   the Trust Legal Provisions and are provided without warranty as
-   described in the Simplified BSD License.
+   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+   license-info) in effect on the date of publication of this document.
+   Please review these documents carefully, as they describe your rights
+   and restrictions with respect to this document.  Code Components
+   extracted from this document must include Revised BSD License text as
+   described in Section 4.e of the Trust Legal Provisions and are
+   provided without warranty as described in the Revised BSD License.
 
 Table of Contents
 
    1.  Summary . . . . . . . . . . . . . . . . . . . . . . . . . . .   3
-     1.1.  Problem: High speed forwarding, high scale fan-in/fan-out   3
+     1.1.  Problem: High speed forwarding, high scale fan-in/
+           fan-out . . . . . . . . . . . . . . . . . . . . . . . . .   3
      1.2.  Solution goal: Lightweight, per-hop, per-flow stateless
            transit hop forwarding  . . . . . . . . . . . . . . . . .   4
      1.3.  Requirement: Support for existing stateless / steering
@@ -86,7 +86,8 @@ Table of Contents
      1.5.  Requirement: Support for DiffServ QoS model on transit
            hops. . . . . . . . . . . . . . . . . . . . . . . . . . .   4
      1.6.  Requirement: Low jitter bounded latency solutions.  . . .   4
-     1.7.  Requirement: Dynamic, application signalled DetNet flows    5
+     1.7.  Requirement: Dynamic, application signalled DetNet
+           flows . . . . . . . . . . . . . . . . . . . . . . . . . .   5
    2.  Evolution of IP/MPLS network technologies and designs . . . .   5
      2.1.  Guaranteed Service with RSVP  . . . . . . . . . . . . . .   5
      2.2.  Hardware forwarding and DiffServ  . . . . . . . . . . . .   6
@@ -94,39 +95,39 @@ Table of Contents
      2.4.  Path Computation Engines (PCE)  . . . . . . . . . . . . .   7
      2.5.  Segment Routing (SR)  . . . . . . . . . . . . . . . . . .   8
      2.6.  BIER  . . . . . . . . . . . . . . . . . . . . . . . . . .   8
-     2.7.  Summary . . . . . . . . . . . . . . . . . . . . . . . . .   8
+     2.7.  Summary . . . . . . . . . . . . . . . . . . . . . . . . .   9
    3.  Additional current considerations . . . . . . . . . . . . . .   9
      3.1.  Impact of application based state in networks . . . . . .   9
-     3.2.  Experience from IP multicast  . . . . . . . . . . . . . .   9
+     3.2.  Experience from IP multicast  . . . . . . . . . . . . . .  10
      3.3.  Service Provider and Private MPLS Networks  . . . . . . .  10
      3.4.  Mission-specific vs. shared infrastructures . . . . . . .  11
-     3.5.  PTP and challenges with clock synchronization . . . . . .  12
-     3.6.  Jitter - in-time versus on-time . . . . . . . . . . . . .  13
+     3.5.  PTP and challenges with clock synchronization . . . . . .  13
+     3.6.  Jitter - in-time versus on-time . . . . . . . . . . . . .  14
    4.  Challenges for high-speed packet forwarding hardware  . . . .  15
-   5.  A reference network design  . . . . . . . . . . . . . . . . .  16
+   5.  A reference network design  . . . . . . . . . . . . . . . . .  17
    6.  Standardized Bounded Latency algorithms . . . . . . . . . . .  19
-     6.1.  Guaranteed Service (GS) . . . . . . . . . . . . . . . . .  19
 
 
 
-Eckert & Bryant         Expires January 13, 2022                [Page 2]
+Eckert & Bryant         Expires 14 September 2023               [Page 2]
 
-Internet-Draft          bounded-latency-problems               July 2021
+Internet-Draft          bounded-latency-problems              March 2023
 
 
-     6.2.  TSN Asynchronous Traffic Shaping (TSN-ATS)  . . . . . . .  19
-     6.3.  Cyclic Queuing and Forwarding (CQF) . . . . . . . . . . .  20
+     6.1.  Guaranteed Service (GS) . . . . . . . . . . . . . . . . .  19
+     6.2.  TSN Asynchronous Traffic Shaping (TSN-ATS)  . . . . . . .  20
+     6.3.  Cyclic Queuing and Forwarding (CQF) . . . . . . . . . . .  21
    7.  Candidate solution directions . . . . . . . . . . . . . . . .  22
      7.1.  Packet tagging based CQF  . . . . . . . . . . . . . . . .  22
      7.2.  Packet tagging based CQF with SR  . . . . . . . . . . . .  23
      7.3.  Per-hop latency indications for Segment Routing . . . . .  23
-     7.4.  Latency Based Forwarding  . . . . . . . . . . . . . . . .  24
+     7.4.  Latency Based Forwarding  . . . . . . . . . . . . . . . .  25
    8.  Conclusions . . . . . . . . . . . . . . . . . . . . . . . . .  25
-   9.  Security Considerations . . . . . . . . . . . . . . . . . . .  25
-   10. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  25
-   11. Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  25
+   9.  Security Considerations . . . . . . . . . . . . . . . . . . .  26
+   10. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  26
+   11. Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  26
    12. Informative References  . . . . . . . . . . . . . . . . . . .  26
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  28
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  29
 
 1.  Summary
 
@@ -164,10 +165,9 @@ Internet-Draft          bounded-latency-problems               July 2021
 
 
 
-
-Eckert & Bryant         Expires January 13, 2022                [Page 3]
+Eckert & Bryant         Expires 14 September 2023               [Page 3]
 
-Internet-Draft          bounded-latency-problems               July 2021
+Internet-Draft          bounded-latency-problems              March 2023
 
 
    Supporting bounded latency at these speeds and fan-in/fan-out raises
@@ -221,9 +221,9 @@ Internet-Draft          bounded-latency-problems               July 2021
 
 
 
-Eckert & Bryant         Expires January 13, 2022                [Page 4]
+Eckert & Bryant         Expires 14 September 2023               [Page 4]
 
-Internet-Draft          bounded-latency-problems               July 2021
+Internet-Draft          bounded-latency-problems              March 2023
 
 
 1.7.  Requirement: Dynamic, application signalled DetNet flows
@@ -266,6 +266,22 @@ Internet-Draft          bounded-latency-problems               July 2021
    only supported the parameters for bandwidth reservation, which was
    henceforth called Call Admission Control (CAC).
 
+
+
+
+
+
+
+
+
+
+
+
+Eckert & Bryant         Expires 14 September 2023               [Page 5]
+
+Internet-Draft          bounded-latency-problems              March 2023
+
+
    In one instance, a software forwarder implementation with RSVP
    supported the Controlled Load (CL) service [RFC2211], which does not
    provide for bounded but instead for controlled latency.  This service
@@ -274,14 +290,6 @@ Internet-Draft          bounded-latency-problems               July 2021
    flows (see [RFC2211], section 11).  This functionality did not
    proliferate into later generations of routers because the execution
    cost of WFQ was too high for a multitude of flows and the scheduling
-
-
-
-Eckert & Bryant         Expires January 13, 2022                [Page 5]
-
-Internet-Draft          bounded-latency-problems               July 2021
-
-
    accuracy was too inaccurate in interrupt driven CPU software
    forwarding with higher speed interfaces (100Mbps...1Gbps).
 
@@ -321,6 +329,15 @@ Internet-Draft          bounded-latency-problems               July 2021
    provider networks was not designed to support these QoS functions for
    P Label Switched Routers (LSR).
 
+
+
+
+
+Eckert & Bryant         Expires 14 September 2023               [Page 6]
+
+Internet-Draft          bounded-latency-problems              March 2023
+
+
    Because CL/GS where not targeted with RSVP-TE, the signaling
    extensions for Interior Gateway Protocols (IGP) required in the
    classical RSVP-TE reservation model (such as [RFC8570] for IS-IS)
@@ -329,14 +346,6 @@ Internet-Draft          bounded-latency-problems               July 2021
    RSVP-TE only supports RSVP-TE to perform bandwidth but not non-
    queuing path latency resource calculations and therefore no latency
    based traffic engineering.
-
-
-
-
-Eckert & Bryant         Expires January 13, 2022                [Page 6]
-
-Internet-Draft          bounded-latency-problems               July 2021
-
 
 2.4.  Path Computation Engines (PCE)
 
@@ -377,6 +386,14 @@ Internet-Draft          bounded-latency-problems               July 2021
    through the network to establish the hop-by-hop LSP.  The use of a
    PCE can likewise eliminate all the reservation state dependent
    signaling from the RSVP-TE IGP extensions, because all the
+
+
+
+Eckert & Bryant         Expires 14 September 2023               [Page 7]
+
+Internet-Draft          bounded-latency-problems              March 2023
+
+
    reservation calculations solely need to happen only on the PCE.
    Nevertheless, the PCE does not eliminate the per-hop signaling
    overhead of RSVP-TE to establish LSPs and hence it did not eliminate
@@ -384,15 +401,6 @@ Internet-Draft          bounded-latency-problems               July 2021
    RSVP-TE in the network, especially for the control plane of P nodes
    adn could hence not resolve the concerns of service providers who had
    chosen not to adopt RSVP-TE.
-
-
-
-
-
-Eckert & Bryant         Expires January 13, 2022                [Page 7]
-
-Internet-Draft          bounded-latency-problems               July 2021
-
 
 2.5.  Segment Routing (SR)
 
@@ -429,6 +437,19 @@ Internet-Draft          bounded-latency-problems               July 2021
    Likewise, this is without the need for per-hop/per-flow steering or
    replication state.
 
+
+
+
+
+
+
+
+
+Eckert & Bryant         Expires 14 September 2023               [Page 8]
+
+Internet-Draft          bounded-latency-problems              March 2023
+
+
 2.7.  Summary
 
    Service Provider networks have evolved especially in the past 25
@@ -442,13 +463,6 @@ Internet-Draft          bounded-latency-problems               July 2021
    evolution from MPLS/RSVP-TE to SR and BIER that eliminated per-flow/
    tunnel forwarding/steering and replication state from the same
    P-nodes.
-
-
-
-Eckert & Bryant         Expires January 13, 2022                [Page 8]
-
-Internet-Draft          bounded-latency-problems               July 2021
-
 
    Finally, early experience with Traffic Engineering churn under high
    load and todays requirements for often NP-complete optimization lead
@@ -485,6 +499,13 @@ Internet-Draft          bounded-latency-problems               July 2021
    more an operational and cost problem, because of its
    unpredictability.
 
+
+
+Eckert & Bryant         Expires 14 September 2023               [Page 9]
+
+Internet-Draft          bounded-latency-problems              March 2023
+
+
 3.2.  Experience from IP multicast
 
    The widest experience with dynamic, application based signaling in
@@ -498,23 +519,15 @@ Internet-Draft          bounded-latency-problems               July 2021
 
    Service Provider L2-VPN and L3-VPN services can offer IP Multicast
    via architectures such as [RFC6513] that attempt to solve/reduce the
-
-
-
-Eckert & Bryant         Expires January 13, 2022                [Page 9]
-
-Internet-Draft          bounded-latency-problems               July 2021
-
-
    problem of customer application driven, per-multicast application in
    a variety of ways, but they all come with their own problems:
 
-   o  In ingress-replication, the ingress-PE sends a separate unicast
+   *  In ingress-replication, the ingress-PE sends a separate unicast
       copy to every egress-PE.  This creates significant excess traffic
       on links close to the ingress-PE and potentially higher-cost
       ingress-PE attachment speeds.
 
-   o  In L3VPN aggregates-trees, the traffic for multiple trees is sent
+   *  In L3VPN aggregates-trees, the traffic for multiple trees is sent
       across a common tree reaching the superset of all egress-PE of all
       included trees.  This reduces the number of trees from one per-
       customer application to a lower number of aggregates this, but it
@@ -536,6 +549,19 @@ Internet-Draft          bounded-latency-problems               July 2021
    transportation networks, it is important to understand how concerns
    for SP networks will apply to such private networks:
 
+
+
+
+
+
+
+
+
+Eckert & Bryant         Expires 14 September 2023              [Page 10]
+
+Internet-Draft          bounded-latency-problems              March 2023
+
+
    While the aforementioned evolution of MPLS networks focused on large-
    scale service provider networks, the very same architectural
    evolution is or will also happen in any private MPLS networks in the
@@ -553,14 +579,6 @@ Internet-Draft          bounded-latency-problems               July 2021
    deployments and that where based on cross-vendor IETF based
    architecture principles and widely, interoperable vendor
    implementations.
-
-
-
-
-Eckert & Bryant         Expires January 13, 2022               [Page 10]
-
-Internet-Draft          bounded-latency-problems               July 2021
-
 
    Another reason for private network operators looking for service
    provider calls designs is that it also is simplifies potential
@@ -592,6 +610,14 @@ Internet-Draft          bounded-latency-problems               July 2021
    P-router signaling) is not primarily a matter of SP/private networks
    or not even of size, but foremost a matter of whether or not the
    network itself is seen as the (a) communications fabric of a large
+
+
+
+Eckert & Bryant         Expires 14 September 2023              [Page 11]
+
+Internet-Draft          bounded-latency-problems              March 2023
+
+
    distributed application or (b) as an independently running shared
    infrastructure across a potentially wide variety of application/
    services with diverging requirements.
@@ -610,14 +636,6 @@ Internet-Draft          bounded-latency-problems               July 2021
    switches, it was easier to improve application device TCP stacks,
    leading for example to BBR TCP.  While this is very much in line with
    the desired Internet architecure that is putting a significant
-
-
-
-Eckert & Bryant         Expires January 13, 2022               [Page 11]
-
-Internet-Draft          bounded-latency-problems               July 2021
-
-
    responsibility onto transport layer protocols in hosts (not limited
    to TCP) to behave "fair" or "ideal", the reality even in many private
    missions centric networks such as manufacturing plant is different.
@@ -641,6 +659,20 @@ Internet-Draft          bounded-latency-problems               July 2021
    on the edge, and due to the absence of per-hop, per-flow state there
    simply is no shared flow state table that needs to be managed across
    multiple different services/subscribers.
+
+
+
+
+
+
+
+
+
+
+Eckert & Bryant         Expires 14 September 2023              [Page 12]
+
+Internet-Draft          bounded-latency-problems              March 2023
+
 
 3.5.  PTP and challenges with clock synchronization
 
@@ -666,14 +698,6 @@ Internet-Draft          bounded-latency-problems               July 2021
    While PTP is becoming more and more widely available, consistent
    support of high accuracy across all target type of switches and
    routers in wide area networks cannot be taken for granted to be a
-
-
-
-Eckert & Bryant         Expires January 13, 2022               [Page 12]
-
-Internet-Draft          bounded-latency-problems               July 2021
-
-
    feasible new requirement raised for DetNet when it did not exist in
    before.  Today, PTP is often found in mobile network fronthauls, but
    not their backhauls or any other broadband aggregation, distribution
@@ -694,6 +718,17 @@ Internet-Draft          bounded-latency-problems               July 2021
    percentage of traffic in a high speed wide area network.  The revenue
    from the service needs to cover the operational cost incurred by its
    exclusive components (hardware, software and operations).
+
+
+
+
+
+
+
+Eckert & Bryant         Expires 14 September 2023              [Page 13]
+
+Internet-Draft          bounded-latency-problems              March 2023
+
 
 3.6.  Jitter - in-time versus on-time
 
@@ -722,14 +757,6 @@ Internet-Draft          bounded-latency-problems               July 2021
    receiving application only has a guarantee for the maximum bounded
    latency, and the real (shorter) latency of any received packet is no
    indication for the latency of the next packet.  Instead, the receiver
-
-
-
-Eckert & Bryant         Expires January 13, 2022               [Page 13]
-
-Internet-Draft          bounded-latency-problems               July 2021
-
-
    application has to be prepared for each and any future packet to
    arrive with the worst possible, e.g.: the bounded latency.
 
@@ -751,6 +778,14 @@ Internet-Draft          bounded-latency-problems               July 2021
    latency raises the challenge to application developers to be able to
    predict the networks worst possible jitter, and this can be
    particularly challenging for embedded, if not constrained receiver
+
+
+
+Eckert & Bryant         Expires 14 September 2023              [Page 14]
+
+Internet-Draft          bounded-latency-problems              March 2023
+
+
    devices with minimum memory to buffer/remember.  When these devices
    are designed against one particular type of network with well-known
    low jitter, then they will not necessarily operate correctly in
@@ -773,18 +808,6 @@ Internet-Draft          bounded-latency-problems               July 2021
    Of course, this comparison is only about the benefit to the
    application and other factors such as the cost/scale of the service
    for the network itself have also to be taken into account.
-
-
-
-
-
-
-
-
-Eckert & Bryant         Expires January 13, 2022               [Page 14]
-
-Internet-Draft          bounded-latency-problems               July 2021
-
 
 4.  Challenges for high-speed packet forwarding hardware
 
@@ -811,6 +834,14 @@ Internet-Draft          bounded-latency-problems               July 2021
    lot more high-speed memory access because of the need to access an
    entry from a state table.  In most cases, this table space can only
    be made to work at line rate packet processing when it is on-chip,
+
+
+
+Eckert & Bryant         Expires 14 September 2023              [Page 15]
+
+Internet-Draft          bounded-latency-problems              March 2023
+
+
    hence it is not only most expensive, it is also crucial to scale
    right.  And as the 1 vs. 100 Gbps example above showed, it is very
    hard to come by an appropriate scale smaller than "would work for
@@ -834,14 +865,6 @@ Internet-Draft          bounded-latency-problems               July 2021
 
    Whereas steering state, such as MPLS label entries can easily scale
    to hundreds of thousands, the same is not clear about shapers or
-
-
-
-Eckert & Bryant         Expires January 13, 2022               [Page 15]
-
-Internet-Draft          bounded-latency-problems               July 2021
-
-
    interleaved regulators.  They are more challenging because they
    require fast (on-chip) read-write memory for the state variables,
    especially when forwarding is parallelized across multiple execution
@@ -864,6 +887,17 @@ Internet-Draft          bounded-latency-problems               July 2021
    reduced peak performance under key events such as reconvergence of
    all or large parts of IGP or BGP routing tables.
 
+
+
+
+
+
+
+Eckert & Bryant         Expires 14 September 2023              [Page 16]
+
+Internet-Draft          bounded-latency-problems              March 2023
+
+
 5.  A reference network design
 
    The following picture shows an example, worst-case network topology
@@ -876,27 +910,6 @@ Internet-Draft          bounded-latency-problems               July 2021
    networks like these so as to not create new constraints against
    network designers by only supporting physical network topologies
    optimized for a particular type of service (bounded latency).
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Eckert & Bryant         Expires January 13, 2022               [Page 16]
-
-Internet-Draft          bounded-latency-problems               July 2021
-
 
             Subscribers, Towers, IoT devices
                        .............
@@ -923,7 +936,7 @@ Internet-Draft          bounded-latency-problems               July 2021
                                       .............
                            Subscribers, Towers, IoT devices
 
-                   Figure 1: Reference Network Topology
+                    Figure 1: Reference Network Topology
 
    An example metropolitan scale network as shown in Figure 1 may
    consist of one or more rings of forwarders.  A ring provides the
@@ -933,6 +946,13 @@ Internet-Draft          bounded-latency-problems               July 2021
    or trenches have to be used.  This is specifically true when the area
    includes not dense populated suburban areas (higher cost per
    subscriber and mile for rollouts).
+
+
+
+Eckert & Bryant         Expires 14 September 2023              [Page 17]
+
+Internet-Draft          bounded-latency-problems              March 2023
+
 
    Multiple, so-called subtended rings typically occur when existing
    networks are expanded into new areas: A new ring is simply connected
@@ -947,13 +967,6 @@ Internet-Draft          bounded-latency-problems               July 2021
    via PE edge-forwarders and (more often) via additional CE type
    devices.  P nodes may also double as PE nodes.
 
-
-
-Eckert & Bryant         Expires January 13, 2022               [Page 17]
-
-Internet-Draft          bounded-latency-problems               July 2021
-
-
    In densely populated regions, P, or PE nodes may have a high number
    of attached devices, shown in the picture with the example of 100 PE
    forwarder connecting to a single P forwarder (or rather two P for
@@ -962,26 +975,26 @@ Internet-Draft          bounded-latency-problems               July 2021
    In summary, the following aspects of these networks are relevant for
    bounded latency:
 
-   o  Link speeds today are at least 100 Gbps and will be Tbps in the
+   *  Link speeds today are at least 100 Gbps and will be Tbps in the
       near future.  Even if only a small percentage of that traffic has
       to support bounded latency, the queuing mechanism need to support
       these high-speed interfaces.
 
-   o  Fan-in/out at PE or P nodes may be (worst case) in the order of
+   *  Fan-in/out at PE or P nodes may be (worst case) in the order of
       hundred(s) of incoming interfaces.  Bounded latency mechanisms
       whose number of queues depend on the number (#I) of interfaces in
       a more than linear fashion, such as (#I^2) in the case of
       [TSN-ATS], may introduce significant challenges for cost-effective
       hardware.
 
-   o  Through the advent of decentralized edge Data Center and peerings
+   *  Through the advent of decentralized edge Data Center and peerings
       between different operators and content providers, traffic flows
       of interest will not solely be between one central site from/to
       subscribers hub&spoke.  Instead arbitrary, traffic engineered
       paths across the topology between any two edges need to be
       supportable in scale with the bounded latency queuing mechanism.
 
-   o  The total number of edge (#E) nodes (PE or CE) for a bounded
+   *  The total number of edge (#E) nodes (PE or CE) for a bounded
       latency service can easily be in the thousands.  Aggregation of
       bounded latency flows on the order of (#E^2), which is the best
       option in per-hop, per-flow solutions such as [TSN-ATS], is likely
@@ -989,7 +1002,15 @@ Internet-Draft          bounded-latency-problems               July 2021
       to be managed across P nodes in such bounded latency queuing
       mechanisms.
 
-   o  The total number of P nodes may be in the hundreds and bounded
+
+
+
+Eckert & Bryant         Expires 14 September 2023              [Page 18]
+
+Internet-Draft          bounded-latency-problems              March 2023
+
+
+   *  The total number of P nodes may be in the hundreds and bounded
       latency flows in the tenths of thousands.  It should also be
       expected that such flows are not necessarily long-term static but
       may need to be provisionable in the time-scale order of for
@@ -1001,28 +1022,19 @@ Internet-Draft          bounded-latency-problems               July 2021
       hardware engineering cost perspective, especially with respect to
       the control plane cost of dynamically setting up per-flow bounded
       latency for flow whenever there is a new flow or all of them
-
-
-
-
-Eckert & Bryant         Expires January 13, 2022               [Page 18]
-
-Internet-Draft          bounded-latency-problems               July 2021
-
-
       whenever there are topology or load changes that make rerouting
       desirable.
 
    Beyond queuing concerns, path selection too specifically for
    deterministic services is a challenge in these networks:
 
-   o  Path lengths may be significantly longer than e.g. 3 hops.  In
+   *  Path lengths may be significantly longer than e.g. 3 hops.  In
       large metropolitan networks, they can reach 20 or more hops.
       Speed of light end-to-end in these networks will be in the order
       of low number of msec.  End-to-end queuing latency can be in the
       same range, if not higher.
 
-   o  To avoid undesirable re-routing under failure when PREOF and
+   *  To avoid undesirable re-routing under failure when PREOF and
       engineered disjoint paths are used, traffic steering needs to
       support efficiently supportable hop-by-hop traffic steering.  In
       networks designed for source-routing (e..: SR routing),
@@ -1046,6 +1058,14 @@ Internet-Draft          bounded-latency-problems               July 2021
    Asynchronous Traffic Shaping [TSN-ATS], which in general is seen as
    superior to GS for high speed hardware implementation.  All the
    concerns described in the TSN-ATS section apply equally or even more
+
+
+
+Eckert & Bryant         Expires 14 September 2023              [Page 19]
+
+Internet-Draft          bounded-latency-problems              March 2023
+
+
    to GS.
 
 6.2.  TSN Asynchronous Traffic Shaping (TSN-ATS)
@@ -1058,14 +1078,6 @@ Internet-Draft          bounded-latency-problems               July 2021
 
    The concept and simplification in interleaved regulators over
    traditional shapers and the concept of interleaved regulators is a
-
-
-
-Eckert & Bryant         Expires January 13, 2022               [Page 19]
-
-Internet-Draft          bounded-latency-problems               July 2021
-
-
    resulting from mathematical work done in the last 10 years starting
    with [UBS].
 
@@ -1097,6 +1109,19 @@ Internet-Draft          bounded-latency-problems               July 2021
    environments than it would be for example likely DetNet target
    routers in metropolitan networks.
 
+
+
+
+
+
+
+
+
+Eckert & Bryant         Expires 14 September 2023              [Page 20]
+
+Internet-Draft          bounded-latency-problems              March 2023
+
+
    In addition, the aforementioned core problems for shapers
    (Section 4), namely control plane, read/write/read cycle access and
    scale equally apply to interleaved regulators, so the main
@@ -1113,14 +1138,6 @@ Internet-Draft          bounded-latency-problems               July 2021
    described earlier in this memo.  It also provides an on-time service
    in which the per-hop and end-to-end jitter is very small, namely in
    the order of a cycle time.
-
-
-
-
-Eckert & Bryant         Expires January 13, 2022               [Page 20]
-
-Internet-Draft          bounded-latency-problems               July 2021
-
 
    [CQF] operates by forwarders sending packets in periodic cycles.
    These cycles are derived from clock synchronization: The start of
@@ -1152,6 +1169,15 @@ Internet-Draft          bounded-latency-problems               July 2021
    of the solution.  Therefore, [CQF] has a challenge with higher speed
    networks.
 
+
+
+
+
+Eckert & Bryant         Expires 14 September 2023              [Page 21]
+
+Internet-Draft          bounded-latency-problems              March 2023
+
+
    The second and even more important problem is that DT includes the
    link latency (2 in [DNBL], Figure 1).  With a speed of light in fibre
    of 200,000 Km, link latency is 10 usec for 2 Km.  This makes [CQF]
@@ -1170,14 +1196,6 @@ Internet-Draft          bounded-latency-problems               July 2021
    In conclusion, [CQF] solves many of the problems discussed in this
    memo, but it's reliance on timestamp synchronized cycles may pose
    undesirable challenges with the required accuracy of PTP in high
-
-
-
-Eckert & Bryant         Expires January 13, 2022               [Page 21]
-
-Internet-Draft          bounded-latency-problems               July 2021
-
-
    speed network and especially limits [CQF] ability to support wider-
    scale networks due to DT.
 
@@ -1203,6 +1221,19 @@ Internet-Draft          bounded-latency-problems               July 2021
    appropriate packet header field, so that the receiver can accordingly
    map the received packet to the right local cycle.
 
+
+
+
+
+
+
+
+
+Eckert & Bryant         Expires 14 September 2023              [Page 22]
+
+Internet-Draft          bounded-latency-problems              March 2023
+
+
    This approach completely eliminates the link-latency as a factor
    impacting the effectiveness of the mechanism, because in this
    approach, the link latency does not impact the DT.  Instead the link
@@ -1226,14 +1257,6 @@ Internet-Draft          bounded-latency-problems               July 2021
    on E-LSP where 3 or 4 EXP code points would be used to indicate the
    cycle value.  Given how such deterministic bounded latency traffic is
    not subject to congestion control, it also does not require
-
-
-
-Eckert & Bryant         Expires January 13, 2022               [Page 22]
-
-Internet-Draft          bounded-latency-problems               July 2021
-
-
    additional ECN EXP code points, so those would be available for e.g.:
    best-effort traffic that should use the same E-LSP.
 
@@ -1259,6 +1282,14 @@ Internet-Draft          bounded-latency-problems               July 2021
    control plane which similarly to packet tagging based CQF or
    [TSN-ATS] would put the work of admitting flows, determining their
    paths and admitting their resources along those paths to some form of
+
+
+
+Eckert & Bryant         Expires 14 September 2023              [Page 23]
+
+Internet-Draft          bounded-latency-problems              March 2023
+
+
    PCE/SDN-Controller.
 
    The basic principle of forwarding in this proposal is to put received
@@ -1282,14 +1313,6 @@ Internet-Draft          bounded-latency-problems               July 2021
    priority queuing on each hop alone is not sufficient to achieve a
    simple, solely per-hop calculated latency bound under high load
    because of the problem of multi-hop burst aggregation and the
-
-
-
-Eckert & Bryant         Expires January 13, 2022               [Page 23]
-
-Internet-Draft          bounded-latency-problems               July 2021
-
-
    resulting hard to calculate incurred upper latency bound.  To
    overcome that calculation issue, shapers or as in [TSN-ATS] their
    optimization, interleaved regulators, are used in [TSN-ATS] and GS.
@@ -1314,6 +1337,15 @@ Internet-Draft          bounded-latency-problems               July 2021
    packets will miss their end-to-end latency bounds, and must be
    treated as lost packets.
 
+
+
+
+
+Eckert & Bryant         Expires 14 September 2023              [Page 24]
+
+Internet-Draft          bounded-latency-problems              March 2023
+
+
    Depending on the algorithms chosen, solutions may or may not rely on
    strong, weak, or no clock synchronization across nodes.
 
@@ -1337,15 +1369,6 @@ Internet-Draft          bounded-latency-problems               July 2021
    differential min/max latency Service Level Objectives (SLO).
    Benefits include the ability to compensate for prior hop incurred
    queuing latency, but also to automatically prioritize packets on a
-
-
-
-
-Eckert & Bryant         Expires January 13, 2022               [Page 24]
-
-Internet-Draft          bounded-latency-problems               July 2021
-
-
    single hop based on their future path length, all without the need
    for any explicit admission control.
 
@@ -1368,6 +1391,16 @@ Internet-Draft          bounded-latency-problems               July 2021
    Bounded Latency for DetNet have been designed by trying to adopt
    solutions developed either several decades ago (GS) or recently for
    limited scope and scale L2 networks [TSN-ATS].
+
+
+
+
+
+
+Eckert & Bryant         Expires 14 September 2023              [Page 25]
+
+Internet-Draft          bounded-latency-problems              March 2023
+
 
    To allow DetNet solutions to explore opportunities in larger speed &
    scale shared network infrastructures, both private and service
@@ -1392,52 +1425,66 @@ Internet-Draft          bounded-latency-problems               July 2021
    Thanks for Yaakov Stein for reviewing and proposing text for
    Section 7.3.
 
-
-
-
-
-
-Eckert & Bryant         Expires January 13, 2022               [Page 25]
-
-Internet-Draft          bounded-latency-problems               July 2021
-
-
 12.  Informative References
 
    [CQF]      IEEE Time-Sensitive Networking (TSN) Task Group., "IEEE
               Std 802.1Qch-2017: IEEE Standard for Local and
-              Metropolitan Area Networks -- Bridges and Bridged Networks
-              -- Amendment 29: Cyclic Queuing and Forwarding", 2017.
+              Metropolitan Area Networks — Bridges and Bridged Networks
+              — Amendment 29: Cyclic Queuing and Forwarding", 2017.
 
-   [DNBL]     Finn, N., Boudec, J. L., Mohammadpour, E., Zhang, J.,
-              Varga, B., and J. Farkas, "DetNet Bounded Latency", draft-
-              ietf-detnet-bounded-latency-06 (work in progress), May
-              2021.
+   [DNBL]     Finn, N., Le Boudec, J., Mohammadpour, E., Zhang, J., and
+              B. Varga, "Deterministic Networking (DetNet) Bounded
+              Latency", Work in Progress, Internet-Draft, draft-ietf-
+              detnet-bounded-latency-10, 8 April 2022,
+              <https://datatracker.ietf.org/doc/html/draft-ietf-detnet-
+              bounded-latency-10>.
 
    [I-D.chen-DetNet-sr-based-bounded-latency]
               Chen, M., Geng, X., and Z. Li, "Segment Routing (SR) Based
-              Bounded Latency", draft-chen-DetNet-sr-based-bounded-
-              latency-01 (work in progress), May 2019.
+              Bounded Latency", Work in Progress, Internet-Draft, draft-
+              chen-detnet-sr-based-bounded-latency-02, 13 March 2023,
+              <https://datatracker.ietf.org/doc/html/draft-chen-detnet-
+              sr-based-bounded-latency-02>.
+
+
+
+
+
+
+
+
+Eckert & Bryant         Expires 14 September 2023              [Page 26]
+
+Internet-Draft          bounded-latency-problems              March 2023
+
 
    [I-D.dang-queuing-with-multiple-cyclic-buffers]
               Liu, B. and J. Dang, "A Queuing Mechanism with Multiple
-              Cyclic Buffers", draft-dang-queuing-with-multiple-cyclic-
-              buffers-00 (work in progress), February 2021.
+              Cyclic Buffers", Work in Progress, Internet-Draft, draft-
+              dang-queuing-with-multiple-cyclic-buffers-00, 22 February
+              2021, <https://datatracker.ietf.org/doc/html/draft-dang-
+              queuing-with-multiple-cyclic-buffers-00>.
 
    [I-D.ietf-bier-te-arch]
-              Eckert, T., Cauchie, G., and M. Menth, "Tree Engineering
-              for Bit Index Explicit Replication (BIER-TE)", draft-ietf-
-              bier-te-arch-10 (work in progress), July 2021.
+              Eckert, T. T., Menth, M., and G. Cauchie, "Tree
+              Engineering for Bit Index Explicit Replication (BIER-TE)",
+              Work in Progress, Internet-Draft, draft-ietf-bier-te-arch-
+              13, 25 April 2022, <https://datatracker.ietf.org/doc/html/
+              draft-ietf-bier-te-arch-13>.
 
    [I-D.qiang-DetNet-large-scale-DetNet]
-              Qiang, L., Geng, X., Liu, B., Eckert, T., Geng, L., and G.
-              Li, "Large-Scale Deterministic IP Network", draft-qiang-
-              DetNet-large-scale-DetNet-05 (work in progress), September
-              2019.
+              Qiang, L., Geng, X., Liu, B., Eckert, T. T., Geng, L., and
+              G. Li, "Large-Scale Deterministic IP Network", Work in
+              Progress, Internet-Draft, draft-qiang-detnet-large-scale-
+              detnet-05, 2 September 2019,
+              <https://datatracker.ietf.org/doc/html/draft-qiang-detnet-
+              large-scale-detnet-05>.
 
    [I-D.stein-srtsn]
-              Stein, Y. (., "Segment Routed Time Sensitive Networking",
-              draft-stein-srtsn-00 (work in progress), February 2021.
+              Stein, Y. J., "Segment Routed Time Sensitive Networking",
+              Work in Progress, Internet-Draft, draft-stein-srtsn-01, 29
+              August 2021, <https://datatracker.ietf.org/doc/html/draft-
+              stein-srtsn-01>.
 
    [LBF]      Clemm, A. and T. Eckert, "High-Precision Latency
               Forwarding over Packet-Programmable Networks", IEEE 2020
@@ -1450,14 +1497,6 @@ Internet-Draft          bounded-latency-problems               July 2021
               Functional Specification", RFC 2205, DOI 10.17487/RFC2205,
               September 1997, <https://www.rfc-editor.org/info/rfc2205>.
 
-
-
-
-Eckert & Bryant         Expires January 13, 2022               [Page 26]
-
-Internet-Draft          bounded-latency-problems               July 2021
-
-
    [RFC2210]  Wroclawski, J., "The Use of RSVP with IETF Integrated
               Services", RFC 2210, DOI 10.17487/RFC2210, September 1997,
               <https://www.rfc-editor.org/info/rfc2210>.
@@ -1465,6 +1504,15 @@ Internet-Draft          bounded-latency-problems               July 2021
    [RFC2211]  Wroclawski, J., "Specification of the Controlled-Load
               Network Element Service", RFC 2211, DOI 10.17487/RFC2211,
               September 1997, <https://www.rfc-editor.org/info/rfc2211>.
+
+
+
+
+
+Eckert & Bryant         Expires 14 September 2023              [Page 27]
+
+Internet-Draft          bounded-latency-problems              March 2023
+
 
    [RFC2212]  Shenker, S., Partridge, C., and R. Guerin, "Specification
               of Guaranteed Quality of Service", RFC 2212,
@@ -1507,17 +1555,20 @@ Internet-Draft          bounded-latency-problems               July 2021
               Routing Architecture", RFC 8402, DOI 10.17487/RFC8402,
               July 2018, <https://www.rfc-editor.org/info/rfc8402>.
 
-
-
-Eckert & Bryant         Expires January 13, 2022               [Page 27]
-
-Internet-Draft          bounded-latency-problems               July 2021
-
-
    [RFC8570]  Ginsberg, L., Ed., Previdi, S., Ed., Giacalone, S., Ward,
               D., Drake, J., and Q. Wu, "IS-IS Traffic Engineering (TE)
               Metric Extensions", RFC 8570, DOI 10.17487/RFC8570, March
               2019, <https://www.rfc-editor.org/info/rfc8570>.
+
+
+
+
+
+
+Eckert & Bryant         Expires 14 September 2023              [Page 28]
+
+Internet-Draft          bounded-latency-problems              March 2023
+
 
    [RFC8578]  Grossman, E., Ed., "Deterministic Networking Use Cases",
               RFC 8578, DOI 10.17487/RFC8578, May 2019,
@@ -1545,8 +1596,8 @@ Internet-Draft          bounded-latency-problems               July 2021
               DOI 10.17487/RFC8986, February 2021,
               <https://www.rfc-editor.org/info/rfc8986>.
 
-   [TSN-ATS]  Specht, J., "P802.1Qcr - Bridges and Bridged Networks
-              Amendment: Asynchronous Traffic Shaping", IEEE , July
+   [TSN-ATS]  Specht, J., "P802.1Qcr – Bridges and Bridged Networks
+              Amendment: Asynchronous Traffic Shaping", IEEE , 9 July
               2020, <https://1.ieee802.org/tsn/802-1qcr/>.
 
    [UBS]      Specht, J. and S. Samii, "Urgency-Based Scheduler for
@@ -1558,67 +1609,16 @@ Authors' Addresses
    Toerless Eckert
    Futurewei Technologies USA
    2220 Central Expressway
-   Santa Clara  CA 95050
-   USA
-
+   Santa Clara,  CA 95050
+   United States of America
    Email: tte@cs.fau.de
-
-
-
-Eckert & Bryant         Expires January 13, 2022               [Page 28]
-
-Internet-Draft          bounded-latency-problems               July 2021
 
 
    Stewart Bryant
    Stewart Bryant Ltd
-
    Email: sb@stewartbryant.com
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Eckert & Bryant         Expires January 13, 2022               [Page 29]
+Eckert & Bryant         Expires 14 September 2023              [Page 29]

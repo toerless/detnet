@@ -5,7 +5,9 @@ title: Problems with existing DetNet bounded latency queuing mechanisms
 abbrev: bounded-latency-problems
 docname: draft-eckert-detnet-bounded-latency-problems-00
 wg: DETNET
+stream: IETF
 category: info
+ipr: trust200902
 
 stand_alone: yes
 pi: [toc, sortrefs, symrefs, comments]
@@ -566,7 +568,7 @@ based on its design and the relative location of the communicating nodes in the 
 One example of such issues was encountered when digital TV receivers (Set Top Boxes, STB)
 designed for (mostly synchronous) digital cable transmission where evolved to become
 IPTV STB, but the playout buffer of < 50 msec was not sufficient to compensate for
-a > 50 msec jitter experienced in IP metropolitan networks.
+a &gt; 50 msec jitter experienced in IP metropolitan networks.
 
 Note that this section does not claim that all applications will benefit from on-time
 service, nor that no application would benefit more from in-time service than from
